@@ -1,7 +1,10 @@
 import nextConnect from "next-connect";
+import { signInUser } from "../../../controllers/UserController";
+import { validateCredentials } from "../../../middlewares/validation";
 
-const routeHandler = nextConnect();
+const AuthHandler = nextConnect();
+AuthHandler.use(validateCredentials);
 
-routeHandler.post(async (req, res) => {});
+AuthHandler.post(signInUser);
 
-export default routeHandler;
+export default AuthHandler;

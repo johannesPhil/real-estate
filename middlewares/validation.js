@@ -1,7 +1,7 @@
 import { sign } from "jsonwebtoken";
-import { hash } from "bcrypt";
+import { compare } from "bcrypt";
 import isEmail from "validator/lib/isEmail";
-import { errorHandler, RegistrationError } from "../helpers/errorHandler";
+import { errorHandler } from "../helpers/errorHandler";
 import isLength from "validator/lib/isLength";
 import User from "../models/User";
 
@@ -32,7 +32,16 @@ export async function validateUserData(req, res, next) {
 export async function validateCredentials(req, res, next) {
 	try {
 		const { email, password } = req.body;
+
+		if (!email || !password) {
+			throw "Please all fields";
+		}
+		if (!isEmail(email)) {
+			throw "Invalid mail address";
+		}
+
+		return next();
 	} catch (error) {
-		errorHandler(error);
+		errorHandler(error, res);
 	}
 }

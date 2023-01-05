@@ -16,5 +16,5 @@ export const errorHandler = (error, res) => {
 	if (typeof error === "string") {
 		return res.status(400).json({ message: error });
 	}
-	// return res.status(error.code).json(error);
+	return res.status(error.code).json(error);
 };
