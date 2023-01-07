@@ -10,6 +10,10 @@ export const registerUser = async (req, res) => {
 	let { name, email, password } = req.body;
 	const saltRounds = 8;
 	hash(password, saltRounds, async (err, hash) => {
+		if (err) {
+			console.log(err);
+			throw "Something went wrong";
+		}
 		if (hash) {
 			password = hash;
 			let createdUser = new User({ name, email, password });
