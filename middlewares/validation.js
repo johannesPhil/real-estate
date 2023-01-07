@@ -45,3 +45,8 @@ export async function validateCredentials(req, res, next) {
 		errorHandler(error, res);
 	}
 }
+
+export async function validateProperty(req, res, next) {
+	const { title, description, type, location, thumbnail, pictures } =
+		req.body;
+}
