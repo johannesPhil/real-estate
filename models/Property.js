@@ -3,15 +3,6 @@ import mongoose from "mongoose";
 const residence = ["self-contained", "flat", "house"];
 const space = ["land", "commercial", "event venue"];
 
-function isRequired(type) {
-	if (type == "residence") {
-		return residence.includes(this.type);
-	}
-	if (type == "space") {
-		return space.includes(this.type);
-	}
-}
-
 const PropertySchema = new mongoose.Schema({
 	title: {
 		type: String,
@@ -39,24 +30,34 @@ const PropertySchema = new mongoose.Schema({
 		required: [true, "Upload pictures for the property"],
 	},
 	room: {
-		type: { Number },
-		required: [isRequired("residence"), "Number of rooms required"],
+		type: Number,
+		required: [isFieldRequired, "Number of bathrooms required"],
 	},
 	bathroom: {
-		type: { Number },
-		required: [isRequired("residence"), "Number of bathrooms required"],
+		type: Number,
+		required: [isRequired, "Number of bathrooms required"],
 	},
 	toilet: {
-		type: { Number },
-		required: [isRequired("residence"), "Number of toilets required"],
+		type: Number,
+		required: [isRequired, "Number of toilets required"],
 	},
 	parking: Number,
 	size: {
-		type: { String },
-		required: [isRequired("space"), "Space size required"],
+		type: String,
+		required: [isRequired, "Space size required"],
 	},
 });
 
-const Property = mongoose.model("Property", PropertySchema);
+function isFieldRequired() {
+	switch ((type = this.type)) {
+		case residence.includes(type):
+			return true;
+		case space.includes(type):
+			return true;
+		default:
+			return false;
+	}
+}
 
-module.exports = mongoose.models.Property || Property;
+module.exports =
+	mongoose.models.Property || mongoose.model("Property", PropertySchema);
