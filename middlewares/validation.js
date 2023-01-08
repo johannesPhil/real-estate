@@ -49,4 +49,6 @@ export async function validateCredentials(req, res, next) {
 export async function validateProperty(req, res, next) {
 	const { title, description, type, location, thumbnail, pictures } =
 		req.body;
+
+	return next();
 }
