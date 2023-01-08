@@ -12,7 +12,6 @@ export class RegistrationError extends ErrorHandler {}
 export class AuthError extends ErrorHandler {}
 
 export const errorHandler = (error, res) => {
-	console.log(typeof error);
 	if (typeof error === "string") {
 		return res.status(400).json({ message: error });
 	}

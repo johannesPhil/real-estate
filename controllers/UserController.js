@@ -58,10 +58,8 @@ export const signInUser = async (req, res) => {
 	try {
 		await dbConnection();
 		const { email, password } = req.body;
-		console.log(req.body);
 
 		let user = await User.findOne({ email });
-		console.log(user);
 		if (!user || user == null) {
 			throw "Wrong email, password combination";
 		}
