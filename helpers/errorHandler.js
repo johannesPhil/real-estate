@@ -19,6 +19,12 @@ export const errorHandler = (error, res) => {
 	if (error.name == "ValidationError") {
 		console.log(error.errors);
 	}
+	if (error.name.includes("Token")) {
+		return res
+			.status(401)
+			.json({ name: error.name, message: error.message });
+	}
+
 	return res
 		.status(500)
 		.json({ error: { name: error.name, message: error.message } });
