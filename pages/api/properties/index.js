@@ -1,5 +1,8 @@
 import nextConnect from "next-connect";
-import { addProperty } from "../../../controllers/PropertyController";
+import {
+	addProperty,
+	fetchProperties,
+} from "../../../controllers/PropertyController";
 import { validateProperty } from "../../../middlewares/validation";
 import multer from "multer";
 import localUpload, {
@@ -7,6 +10,7 @@ import localUpload, {
 	picturesUpload,
 	thumbnailUpload,
 } from "../../../helpers/fileUpload";
+import { verifyToken } from "../../../middlewares/jwt";
 
 export const config = {
 	api: {
@@ -15,13 +19,10 @@ export const config = {
 };
 
 const propertyRouteHandler = nextConnect();
-propertyRouteHandler.use(
-	multer().any(),
-	// thumbnailUpload.single("thumbnail"),
-	// picturesUpload.array("pictures"),
-	validateProperty
-);
+propertyRouteHandler.use(verifyToken);
 
-propertyRouteHandler.post(addProperty);
+propertyRouteHandler.post(multer().any(), validateProperty, addProperty);
+
+propertyRouteHandler.get(fetchProperties);
 
 export default propertyRouteHandler;
