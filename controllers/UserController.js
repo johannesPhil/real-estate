@@ -28,7 +28,11 @@ export const registerUser = async (req, res) => {
 			}
 			try {
 				token = sign(
-					{ id: registeredUser.id, email: registeredUser.email },
+					{
+						id: registeredUser.id,
+						email: registeredUser.email,
+						name: registeredUser.name,
+					},
 					process.env.JWT_SECRET,
 					{ expiresIn: "1d" }
 				);
@@ -69,7 +73,7 @@ export const signInUser = async (req, res) => {
 			throw "Wrong email, password combination";
 		}
 		let token = sign(
-			{ id: user.id, email: user.email },
+			{ id: user.id, email: user.email, name: user.name },
 			process.env.JWT_SECRET,
 			{ expiresIn: "1d" }
 		);

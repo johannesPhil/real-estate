@@ -55,3 +55,8 @@ export const addProperty = async (req, res) => {
 		errorHandler(error, res);
 	}
 };
+
+export const fetchProperties = async (req, res) => {
+	const properties = await Property.find({});
+	return res.json(properties);
+};
