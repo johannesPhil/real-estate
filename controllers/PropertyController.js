@@ -113,3 +113,19 @@ export const editProperty = async (req, res) => {
 		errorHandler(error, res);
 	}
 };
+
+export const deleteProperty = async (req, res) => {
+	const {
+		query: { id },
+	} = req;
+
+	try {
+		const deleteResult = await Property.deleteOne({ _id: id });
+		if (!deleteResult) {
+			throw "Something went wrong. Try again";
+		}
+		return res.json({ status: "success", deleteResult });
+	} catch (error) {
+		errorHandler(error, res);
+	}
+};
