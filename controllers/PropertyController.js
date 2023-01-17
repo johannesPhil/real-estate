@@ -1,11 +1,7 @@
 import dbConnection from "../helpers/dbConnection";
 import { errorHandler } from "../helpers/errorHandler";
 import Property from "../models/Property";
-import { upload } from "../helpers/cloudinary";
-
-import DataURIParser from "datauri/parser";
-
-const parser = new DataURIParser();
+import { createImage } from "../helpers/parseImage";
 
 export const addProperty = async (req, res) => {
 	await dbConnection();
@@ -14,13 +10,6 @@ export const addProperty = async (req, res) => {
 	let picturesURL = [];
 	const { title, description, type, location, room, bathroom, toilet } =
 		req.body;
-
-	const createImage = async (image, folder) => {
-		let imageExtension = image.mimetype.split("/")[1];
-		const base64Img = parser.format(imageExtension, image.buffer);
-		const response = await upload(base64Img.content, folder);
-		return response;
-	};
 
 	const thumbnailFile = req.files.filter(
 		(image) => image.fieldname === "thumbnail"
@@ -33,7 +22,6 @@ export const addProperty = async (req, res) => {
 
 	for (const picture of pictureFiles) {
 		let image = await createImage(picture, "Chinedu/pictures");
-		console.log(image.url);
 		picturesURL.push(image.url);
 	}
 
@@ -49,7 +37,6 @@ export const addProperty = async (req, res) => {
 			throw "Something went wrong";
 		}
 
-		console.log(savedProperty);
 		return res.json({ status: "success", data: savedProperty });
 	} catch (error) {
 		errorHandler(error, res);
@@ -59,4 +46,70 @@ export const addProperty = async (req, res) => {
 export const fetchProperties = async (req, res) => {
 	const properties = await Property.find({});
 	return res.json(properties);
+};
+
+export const fetchProperty = async (req, res) => {
+	const {
+		query: { id },
+	} = req;
+	Property.findById(id, (err, property) => {
+		if (property) {
+			return res.json(property);
+		} else {
+			errorHandler(err, res);
+		}
+	});
+};
+
+export const editProperty = async (req, res) => {
+	const {
+		query: { id },
+		body,
+		files,
+	} = req;
+
+	let newThumbnailURL;
+	let picturesURL = [];
+
+	let propertyMatch = await Property.findById(id);
+	if (files.length) {
+		const newThumbnail = files.filter(
+			(file) => file.fieldname === "thumbnail"
+		);
+
+		if (newThumbnail.length) {
+			newThumbnailURL = await createImage(
+				newThumbnail[0],
+				"Chinedu/thumbnails"
+			);
+			propertyMatch.thumbnail = newThumbnailURL.url;
+		}
+
+		const newPictures = files.filter(
+			(file) => file.fieldname === "pictures"
+		);
+
+		if (newPictures.length) {
+			for (const picture of newPictures) {
+				let image = await createImage(picture, "Chinedu/pictures");
+				picturesURL.push(image.url);
+			}
+			propertyMatch.pictures = picturesURL;
+		}
+	}
+	for (const [key, value] of Object.entries(body)) {
+		propertyMatch[key] = value;
+	}
+
+	try {
+		let editResult = await propertyMatch.save();
+
+		if (!editResult) {
+			throw "Something went wrong. Try again";
+		}
+
+		return res.json({ status: "success", data: editResult });
+	} catch (error) {
+		errorHandler(error, res);
+	}
 };
